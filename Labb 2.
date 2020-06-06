@@ -1,0 +1,528 @@
+ Encoding: UTF-8.
+
+DATASET ACTIVATE DataSet1.
+FREQUENCIES VARIABLES=sex
+  /STATISTICS=MODE SUM
+  /PIECHART FREQ
+  /ORDER=ANALYSIS.
+
+DESCRIPTIVES VARIABLES=age pain
+  /STATISTICS=MEAN STDDEV MIN MAX.
+
+SPSSINC CREATE DUMMIES VARIABLE=sex 
+ROOTNAME1=SexDummy 
+/OPTIONS ORDER=A USEVALUELABELS=YES USEML=YES OMITFIRST=NO.
+
+SPSSINC CREATE DUMMIES VARIABLE=sex 
+ROOTNAME1=SexDummy 
+/OPTIONS ORDER=A USEVALUELABELS=YES USEML=YES OMITFIRST=NO.
+
+DESCRIPTIVES VARIABLES=age pain STAI_trait pain_cat cortisol_serum cortisol_saliva mindfulness 
+    weight IQ household_income
+  /STATISTICS=MEAN STDDEV MIN MAX.
+
+FREQUENCIES VARIABLES=age STAI_trait pain_cat cortisol_serum cortisol_saliva mindfulness weight IQ
+  /NTILES=4
+  /STATISTICS=STDDEV VARIANCE RANGE MINIMUM MAXIMUM MEAN MEDIAN MODE SUM SKEWNESS SESKEW KURTOSIS 
+    SEKURT
+  /HISTOGRAM NORMAL
+  /ORDER=ANALYSIS.
+
+FREQUENCIES VARIABLES=age STAI_trait pain_cat cortisol_serum cortisol_saliva mindfulness weight IQ
+  /NTILES=4
+  /STATISTICS=STDDEV VARIANCE RANGE MINIMUM MAXIMUM MEAN MEDIAN MODE SUM SKEWNESS SESKEW KURTOSIS 
+    SEKURT
+  /HISTOGRAM NORMAL
+  /ORDER=ANALYSIS.
+
+FREQUENCIES VARIABLES=age STAI_trait pain_cat cortisol_serum cortisol_saliva mindfulness weight IQ 
+    household_income
+  /NTILES=4
+  /STATISTICS=STDDEV VARIANCE RANGE MINIMUM MAXIMUM MEAN MEDIAN MODE SUM SKEWNESS SESKEW KURTOSIS 
+    SEKURT
+  /HISTOGRAM NORMAL
+  /ORDER=ANALYSIS.
+
+FREQUENCIES VARIABLES=pain
+  /NTILES=4
+  /STATISTICS=STDDEV VARIANCE RANGE MINIMUM MAXIMUM MEDIAN MODE SUM SKEWNESS SESKEW KURTOSIS SEKURT
+  /HISTOGRAM NORMAL
+  /ORDER=ANALYSIS.
+
+FREQUENCIES VARIABLES=pain
+  /NTILES=4
+  /STATISTICS=STDDEV VARIANCE RANGE MINIMUM MAXIMUM MEDIAN MODE SUM SKEWNESS SESKEW KURTOSIS SEKURT
+  /HISTOGRAM NORMAL
+  /ORDER=ANALYSIS.
+
+FREQUENCIES VARIABLES=mindfulness
+  /NTILES=4
+  /STATISTICS=STDDEV VARIANCE RANGE MINIMUM MAXIMUM MEDIAN MODE SUM SKEWNESS SESKEW KURTOSIS SEKURT
+  /HISTOGRAM NORMAL
+  /ORDER=ANALYSIS.
+
+REGRESSION
+  /DESCRIPTIVES MEAN STDDEV CORR SIG N
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS CI(95) BCOV R ANOVA COLLIN TOL CHANGE ZPP
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT pain
+  /METHOD=ENTER SexDummy_1 age
+  /SCATTERPLOT=(*ZRESID ,*ZPRED)
+  /RESIDUALS DURBIN HISTOGRAM(ZRESID) NORMPROB(ZRESID)
+  /CASEWISE PLOT(ZRESID) OUTLIERS(2)
+  /SAVE COOK.
+
+REGRESSION
+  /DESCRIPTIVES MEAN STDDEV CORR SIG N
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS CI(95) BCOV R ANOVA COLLIN TOL CHANGE ZPP
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT pain
+  /METHOD=ENTER SexDummy_1 age STAI_trait pain_cat mindfulness cortisol_serum cortisol_saliva
+  /SCATTERPLOT=(*ZRESID ,*ZPRED)
+  /RESIDUALS DURBIN HISTOGRAM(ZRESID) NORMPROB(ZRESID)
+  /CASEWISE PLOT(ZRESID) OUTLIERS(2)
+  /SAVE COOK.
+
+MEANS TABLES=pain BY SexDummy_1 age STAI_trait pain_cat cortisol_serum cortisol_saliva mindfulness
+  /CELLS=MEAN COUNT STDDEV
+  /STATISTICS LINEARITY.
+
+CORRELATIONS
+  /VARIABLES=pain SexDummy_1 STAI_trait pain_cat cortisol_serum cortisol_saliva mindfulness
+  /PRINT=TWOTAIL NOSIG
+  /MISSING=PAIRWISE.
+
+DATASET ACTIVATE DataSet1.
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS CI(95) R ANOVA COLLIN TOL CHANGE
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT pain
+  /METHOD=ENTER SexDummy_1 age
+  /METHOD=ENTER STAI_trait pain_cat cortisol_serum cortisol_saliva mindfulness
+  /SCATTERPLOT=(*ZPRED ,*ZRESID)
+  /RESIDUALS DURBIN HISTOGRAM(ZRESID) NORMPROB(ZRESID)
+  /CASEWISE PLOT(ZRESID) OUTLIERS(2)
+  /SAVE COOK.
+
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS CI(95) R ANOVA COLLIN TOL CHANGE SELECTION
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT pain
+  /METHOD=ENTER SexDummy_1 age
+  /METHOD=ENTER STAI_trait pain_cat cortisol_serum cortisol_saliva mindfulness
+  /SCATTERPLOT=(*ZPRED ,*ZRESID)
+  /RESIDUALS DURBIN HISTOGRAM(ZRESID) NORMPROB(ZRESID)
+  /CASEWISE PLOT(ZRESID) OUTLIERS(2)
+  /SAVE COOK.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=age pain MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=YES.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: age=col(source(s), name("age"))
+  DATA: pain=col(source(s), name("pain"), unit.category())
+  GUIDE: axis(dim(1), label("age"))
+  GUIDE: axis(dim(2), label("pain"))
+  GUIDE: text.title(label("Simple Scatter with Fit Line of pain by age"))
+  ELEMENT: point(position(age*pain))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=age pain MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=YES.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: age=col(source(s), name("age"))
+  DATA: pain=col(source(s), name("pain"), unit.category())
+  GUIDE: axis(dim(1), label("age"))
+  GUIDE: axis(dim(2), label("pain"))
+  GUIDE: text.title(label("Simple Scatter with Fit Line of pain by age"))
+  ELEMENT: point(position(age*pain))
+END GPL.
+
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS CI(95) R ANOVA COLLIN TOL CHANGE SELECTION
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT pain
+  /METHOD=ENTER SexDummy_1 age
+  /METHOD=ENTER STAI_trait pain_cat cortisol_serum cortisol_saliva mindfulness
+  /SCATTERPLOT=(*ZPRED ,*ZRESID)
+  /RESIDUALS DURBIN HISTOGRAM(ZRESID) NORMPROB(ZRESID)
+  /CASEWISE PLOT(ZRESID) OUTLIERS(2)
+  /SAVE COOK.
+
+DATASET ACTIVATE DataSet1.
+CORRELATIONS
+  /VARIABLES=pain age STAI_trait pain_cat cortisol_serum cortisol_saliva mindfulness
+  /PRINT=TWOTAIL NOSIG
+  /MISSING=PAIRWISE.
+
+EXAMINE VARIABLES=pain BY sex age STAI_trait pain_cat cortisol_serum cortisol_saliva mindfulness
+  /PLOT BOXPLOT STEMLEAF
+  /COMPARE GROUPS
+  /STATISTICS DESCRIPTIVES
+  /CINTERVAL 95
+  /MISSING LISTWISE
+  /NOTOTAL.
+
+EXAMINE VARIABLES=pain BY sex age STAI_trait pain_cat cortisol_serum cortisol_saliva mindfulness
+  /PLOT BOXPLOT STEMLEAF HISTOGRAM
+  /COMPARE GROUPS
+  /STATISTICS NONE
+  /CINTERVAL 95
+  /MISSING LISTWISE
+  /NOTOTAL.
+
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS CI(95) R ANOVA COLLIN TOL CHANGE SELECTION
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT pain
+  /METHOD=ENTER SexDummy_1 age
+  /METHOD=ENTER STAI_trait pain_cat cortisol_serum cortisol_saliva mindfulness
+  /SCATTERPLOT=(*ZRESID ,*ZPRED)
+  /RESIDUALS DURBIN HISTOGRAM(ZRESID) NORMPROB(ZRESID)
+  /CASEWISE PLOT(ZRESID) OUTLIERS(2)
+  /SAVE COOK.
+
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS CI(95) R ANOVA COLLIN TOL CHANGE SELECTION
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT pain
+  /METHOD=ENTER SexDummy_1 age
+  /METHOD=ENTER STAI_trait pain_cat cortisol_serum cortisol_saliva mindfulness
+  /SCATTERPLOT=(*ZRESID ,*ZPRED)
+  /RESIDUALS DURBIN HISTOGRAM(ZRESID) NORMPROB(ZRESID)
+  /CASEWISE PLOT(ZRESID) OUTLIERS(2)
+  /SAVE PRED COOK RESID.
+
+FREQUENCIES VARIABLES=pain age STAI_trait pain_cat cortisol_serum cortisol_saliva mindfulness
+  /NTILES=4
+  /STATISTICS=STDDEV MINIMUM MAXIMUM SEMEAN MEAN MEDIAN MODE SKEWNESS SESKEW KURTOSIS SEKURT
+  /HISTOGRAM
+  /ORDER=ANALYSIS.
+
+FREQUENCIES VARIABLES=pain age STAI_trait pain_cat cortisol_serum cortisol_saliva mindfulness
+  /NTILES=4
+  /STATISTICS=STDDEV MINIMUM MAXIMUM SEMEAN MEAN MEDIAN MODE SKEWNESS SESKEW KURTOSIS SEKURT
+  /HISTOGRAM NORMAL
+  /ORDER=ANALYSIS.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=ID COO_13 MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: ID=col(source(s), name("ID"), unit.category())
+  DATA: COO_13=col(source(s), name("COO_13"))
+  GUIDE: axis(dim(1), label("ID"))
+  GUIDE: axis(dim(2), label("Cook's Distance"))
+  GUIDE: text.title(label("Simple Scatter of Cook's Distance by ID"))
+  SCALE: linear(dim(2), include(0))
+  ELEMENT: point(position(ID*COO_13))
+END GPL.
+
+COMPUTE CortisolIndex=cortisol_serum + cortisol_saliva.
+EXECUTE.
+
+FREQUENCIES VARIABLES=CortisolIndex
+  /NTILES=4
+  /STATISTICS=STDDEV MINIMUM MAXIMUM SEMEAN MEAN MEDIAN MODE SKEWNESS SESKEW KURTOSIS SEKURT
+  /HISTOGRAM NORMAL
+  /ORDER=ANALYSIS.
+
+COMPUTE CortisolIndex2=(cortisol_serum + cortisol_saliva) - 5.23.
+EXECUTE.
+
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS CI(95) R ANOVA COLLIN TOL
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT pain
+  /METHOD=ENTER SexDummy_1 age
+  /METHOD=ENTER STAI_trait pain_cat mindfulness CortisolIndex2
+  /SCATTERPLOT=(*ZRESID ,*ZPRED)
+  /RESIDUALS DURBIN HISTOGRAM(ZRESID) NORMPROB(ZRESID)
+  /CASEWISE PLOT(ZRESID) OUTLIERS(2)
+  /SAVE PRED COOK RESID.
+
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS CI(95) R ANOVA COLLIN TOL CHANGE SELECTION
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT pain
+  /METHOD=ENTER SexDummy_1 age
+  /METHOD=ENTER STAI_trait pain_cat mindfulness cortisol_serum
+  /SCATTERPLOT=(*ZRESID ,*ZPRED)
+  /RESIDUALS DURBIN HISTOGRAM(ZRESID) NORMPROB(ZRESID)
+  /CASEWISE PLOT(ZRESID) OUTLIERS(2)
+  /SAVE PRED COOK RESID.
+
+FREQUENCIES VARIABLES=RES_9
+  /NTILES=4
+  /STATISTICS=STDDEV MINIMUM MAXIMUM SEMEAN MEAN MEDIAN MODE SKEWNESS SESKEW KURTOSIS SEKURT
+  /HISTOGRAM NORMAL
+  /ORDER=ANALYSIS.
+
+EXAMINE VARIABLES=RES_9
+  /PLOT BOXPLOT STEMLEAF HISTOGRAM NPPLOT
+  /COMPARE GROUPS
+  /STATISTICS NONE
+  /CINTERVAL 95
+  /MISSING LISTWISE
+  /NOTOTAL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=age pain MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: age=col(source(s), name("age"))
+  DATA: pain=col(source(s), name("pain"), unit.category())
+  GUIDE: axis(dim(1), label("age"))
+  GUIDE: axis(dim(2), label("pain"))
+  GUIDE: text.title(label("Simple Scatter of pain by age"))
+  ELEMENT: point(position(age*pain))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=age pain MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: age=col(source(s), name("age"))
+  DATA: pain=col(source(s), name("pain"))
+  GUIDE: axis(dim(1), label("age"))
+  GUIDE: axis(dim(2), label("pain"))
+  GUIDE: text.title(label("Simple Scatter of pain by age"))
+  ELEMENT: point(position(age*pain))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=STAI_trait pain MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: STAI_trait=col(source(s), name("STAI_trait"))
+  DATA: pain=col(source(s), name("pain"))
+  GUIDE: axis(dim(1), label("STAI_trait"))
+  GUIDE: axis(dim(2), label("pain"))
+  GUIDE: text.title(label("Simple Scatter of pain by STAI_trait"))
+  ELEMENT: point(position(STAI_trait*pain))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=STAI_trait pain MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: STAI_trait=col(source(s), name("STAI_trait"))
+  DATA: pain=col(source(s), name("pain"))
+  GUIDE: axis(dim(1), label("STAI_trait"))
+  GUIDE: axis(dim(2), label("pain"))
+  GUIDE: text.title(label("Simple Scatter of pain by STAI_trait"))
+  ELEMENT: point(position(STAI_trait*pain))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=age pain MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: age=col(source(s), name("age"))
+  DATA: pain=col(source(s), name("pain"))
+  GUIDE: axis(dim(1), label("age"))
+  GUIDE: axis(dim(2), label("pain"))
+  GUIDE: text.title(label("Simple Scatter of pain by age"))
+  ELEMENT: point(position(age*pain))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=pain_cat pain MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: pain_cat=col(source(s), name("pain_cat"))
+  DATA: pain=col(source(s), name("pain"))
+  GUIDE: axis(dim(1), label("pain_cat"))
+  GUIDE: axis(dim(2), label("pain"))
+  GUIDE: text.title(label("Simple Scatter of pain by pain_cat"))
+  ELEMENT: point(position(pain_cat*pain))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=pain_cat pain MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: pain_cat=col(source(s), name("pain_cat"))
+  DATA: pain=col(source(s), name("pain"))
+  GUIDE: axis(dim(1), label("pain_cat"))
+  GUIDE: axis(dim(2), label("pain"))
+  GUIDE: text.title(label("Simple Scatter of pain by pain_cat"))
+  ELEMENT: point(position(pain_cat*pain))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=mindfulness pain MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: mindfulness=col(source(s), name("mindfulness"))
+  DATA: pain=col(source(s), name("pain"))
+  GUIDE: axis(dim(1), label("mindfulness"))
+  GUIDE: axis(dim(2), label("pain"))
+  GUIDE: text.title(label("Simple Scatter of pain by mindfulness"))
+  ELEMENT: point(position(mindfulness*pain))
+END GPL.
+
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS CI(95) R ANOVA COLLIN TOL CHANGE SELECTION
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT pain
+  /METHOD=ENTER SexDummy_1 age
+  /METHOD=ENTER STAI_trait pain_cat mindfulness cortisol_serum
+  /METHOD=ENTER Agesquared
+  /SCATTERPLOT=(*ZRESID ,*ZPRED)
+  /RESIDUALS DURBIN HISTOGRAM(ZRESID) NORMPROB(ZRESID)
+  /CASEWISE PLOT(ZRESID) OUTLIERS(2)
+  /SAVE PRED COOK RESID.
+
+CORRELATIONS
+  /VARIABLES=cortisol_serum cortisol_saliva
+  /PRINT=TWOTAIL NOSIG
+  /MISSING=PAIRWISE.
+
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS CI(95) R ANOVA COLLIN TOL
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT pain
+  /METHOD=ENTER SexDummy_1 age
+  /METHOD=ENTER STAI_trait pain_cat mindfulness cortisol_serum
+  /METHOD=ENTER Mindfulness_Sq
+  /SCATTERPLOT=(*ZRESID ,*ZPRED)
+  /RESIDUALS DURBIN HISTOGRAM(ZRESID) NORMPROB(ZRESID)
+  /CASEWISE PLOT(ZRESID) OUTLIERS(2)
+  /SAVE PRED COOK RESID.
+
+COMPUTE Residual_Squared=RES_6 * RES_6.
+EXECUTE.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=ID COO_7 MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: ID=col(source(s), name("ID"), unit.category())
+  DATA: COO_7=col(source(s), name("COO_7"))
+  GUIDE: axis(dim(1), label("ID"))
+  GUIDE: axis(dim(2), label("Cook's Distance"))
+  GUIDE: text.title(label("Simple Scatter of Cook's Distance by ID"))
+  SCALE: linear(dim(2), include(0))
+  ELEMENT: point(position(ID*COO_7))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=ID COO_8 MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: ID=col(source(s), name("ID"), unit.category())
+  DATA: COO_8=col(source(s), name("COO_8"))
+  GUIDE: axis(dim(1), label("ID"))
+  GUIDE: axis(dim(2), label("Cook's Distance"))
+  GUIDE: text.title(label("Simple Scatter of Cook's Distance by ID"))
+  SCALE: linear(dim(2), include(0))
+  ELEMENT: point(position(ID*COO_8))
+END GPL.
+
+USE ALL.
+COMPUTE filter_$=(COO_8 > 0.025).
+VARIABLE LABELS filter_$ 'COO_8 > 0.025 (FILTER)'.
+VALUE LABELS filter_$ 0 'Not Selected' 1 'Selected'.
+FORMATS filter_$ (f1.0).
+FILTER BY filter_$.
+EXECUTE.
+
+USE ALL.
+COMPUTE filter_$=(COO_8 > 0.025).
+VARIABLE LABELS filter_$ 'COO_8 > 0.025 (FILTER)'.
+VALUE LABELS filter_$ 0 'Not Selected' 1 'Selected'.
+FORMATS filter_$ (f1.0).
+FILTER BY filter_$.
+EXECUTE.
+
+EXAMINE VARIABLES=RES_8
+  /PLOT HISTOGRAM NPPLOT
+  /STATISTICS NONE
+  /CINTERVAL 95
+  /MISSING LISTWISE
+  /NOTOTAL.
+
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS CI(95) R ANOVA COLLIN TOL CHANGE SELECTION
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT pain
+  /METHOD=ENTER SexDummy_1 age
+  /METHOD=ENTER STAI_trait pain_cat mindfulness cortisol_serum
+  /SCATTERPLOT=(*ZRESID ,*ZPRED)
+  /RESIDUALS DURBIN HISTOGRAM(ZRESID) NORMPROB(ZRESID)
+  /CASEWISE PLOT(ZRESID) OUTLIERS(2)
+  /SAVE PRED COOK RESID.
+
+DATASET ACTIVATE DataSet1.
+EXAMINE VARIABLES=RES_8 BY age STAI_trait pain_cat cortisol_serum SexDummy_1 mindfulness
+  /PLOT BOXPLOT STEMLEAF
+  /COMPARE GROUPS
+  /STATISTICS DESCRIPTIVES
+  /CINTERVAL 95
+  /MISSING LISTWISE
+  /NOTOTAL.
