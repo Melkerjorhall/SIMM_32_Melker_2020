@@ -1,0 +1,123 @@
+* Encoding: UTF-8.
+
+DATASET ACTIVATE DataSet5.
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS R ANOVA
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT pain
+  /METHOD=ENTER age STAI_trait pain_cat cortisol_serum mindfulness.
+
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS R ANOVA
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT pain
+  /METHOD=ENTER age STAI_trait pain_cat cortisol_serum mindfulness sexDummy_1.
+
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS CI(95) R ANOVA CHANGE
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT pain
+  /METHOD=ENTER age sexDummy_1
+  /METHOD=ENTER STAI_trait pain_cat cortisol_serum mindfulness.
+
+MIXED pain WITH sexDummy_1 age STAI_trait pain_cat cortisol_serum mindfulness
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=sexDummy_1 age STAI_trait pain_cat cortisol_serum mindfulness | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=SOLUTION
+  /RANDOM=INTERCEPT | SUBJECT(hospital) COVTYPE(VC).
+
+MIXED pain WITH sexDummy_1 age STAI_trait pain_cat cortisol_serum mindfulness
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=| SSTYPE(3)
+  /METHOD=REML
+  /PRINT=SOLUTION
+  /RANDOM=INTERCEPT | SUBJECT(hospital) COVTYPE(VC).
+
+MIXED pain WITH sexDummy_1 age STAI_trait pain_cat cortisol_serum mindfulness
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=sexDummy_1 age STAI_trait pain_cat cortisol_serum mindfulness | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=SOLUTION
+  /RANDOM=INTERCEPT | SUBJECT(hospital) COVTYPE(VC).
+
+MIXED pain WITH sexDummy_1 age STAI_trait pain_cat cortisol_serum mindfulness
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=sexDummy_1 age STAI_trait pain_cat cortisol_serum mindfulness | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=DESCRIPTIVES  R SOLUTION
+  /RANDOM=INTERCEPT | SUBJECT(hospital) COVTYPE(VC)
+  /SAVE=FIXPRED.
+
+DESCRIPTIVES VARIABLES=Fixed_Pred_Values
+  /STATISTICS=MEAN STDDEV VARIANCE MIN MAX.
+
+DATASET ACTIVATE DataSet4.
+COMPUTE error_fullmod=pain - RegressionA_poop.
+EXECUTE.
+
+COMPUTE error_fullmod_squared=error_fullmod * error_fullmod.
+EXECUTE.
+
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS R ANOVA
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT pain
+  /METHOD=ENTER age sexdummy_1 STAI_trait pain_cat cortisol_serum mindfulness.
+
+DATASET ACTIVATE DataSet1.
+COMPUTE pain_true_sum_squares=pain_TSS * pain_TSS.
+EXECUTE.
+
+COMPUTE AgeModelA=age*-0.054400.
+EXECUTE.
+
+COMPUTE STAI_modelA=STAI_trait * 0.001437.
+EXECUTE.
+
+COMPUTE cortisol_modelA=cortisol_serum * 0.610010.
+EXECUTE.
+
+COMPUTE mindfullness_modelA=mindfulness * -0.262441.
+EXECUTE.
+
+COMPUTE femaledummy_modelA=sexdummy_1 * -0.297545.
+EXECUTE.
+
+COMPUTE paincat_modelA=pain_cat * 0.036885.
+EXECUTE.
+
+COMPUTE ModelA_regression_fit=AgeModelA + STAI_modelA + paincat_modelA + cortisol_modelA + 
+    mindfullness_modelA + femaledummy_modelA + 3.799851.
+EXECUTE.
+
+DESCRIPTIVES VARIABLES=ModelA_regression_fit
+  /STATISTICS=MEAN SUM STDDEV MIN MAX.
+
+DATASET ACTIVATE DataSet1.
+COMPUTE ModelA_fit=(age *-0.054400)+ (STAI_trait *0.001437) + (pain_cat *0.036885)  + 
+    (cortisol_serum *0.610010)  + (mindfulness *-0.262441)  + (sexdummy_1 *-0.297545 )+3.799851  .
+EXECUTE.
+
+COMPUTE RegressionEquation=(age *-0.054400)+ (STAI_trait *0.001437)  + (pain_cat *0.036885)  + 
+    (cortisol_serum *0.610010)  + (mindfulness *-0.262441)  + (sexdummy_1 *-0.297545) +3.799851.
+EXECUTE.
+
+DATASET ACTIVATE DataSet3.
+COMPUTE Residuals=pain - regequation.
+EXECUTE.
+
+COMPUTE Residuals_sum_square=Residuals * Residuals.
+EXECUTE.
