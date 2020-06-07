@@ -1,0 +1,407 @@
+[1] -- Saturday, June 06, 2020 -- 17:50:19
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.15
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	3
+	Number of measurements	=	2
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	13.5000000
+	Critical F	=	3.1012958
+	Numerator df	=	2.0000000
+	Denominator df	=	87.0000000
+	Total sample size	=	90
+	Actual power	=	0.9088800
+
+[2] -- Saturday, June 06, 2020 -- 18:02:12
+F tests - ANOVA: Repeated measures, within factors
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.15
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	3
+	Number of measurements	=	2
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	11.2500000
+	Critical F	=	3.9738970
+	Numerator df	=	1.0000000
+	Denominator df	=	72.0000000
+	Total sample size	=	75
+	Actual power	=	0.9113433
+
+[3] -- Saturday, June 06, 2020 -- 19:34:19
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.15
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	3
+	Number of measurements	=	2
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	13.5000000
+	Critical F	=	3.1012958
+	Numerator df	=	2.0000000
+	Denominator df	=	87.0000000
+	Total sample size	=	90
+	Actual power	=	0.9088800
+
+[4] -- Saturday, June 06, 2020 -- 19:34:23
+F tests - ANOVA: Repeated measures, within factors
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.15
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	3
+	Number of measurements	=	2
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	11.2500000
+	Critical F	=	3.9738970
+	Numerator df	=	1.0000000
+	Denominator df	=	72.0000000
+	Total sample size	=	75
+	Actual power	=	0.9113433
+
+[5] -- Saturday, June 06, 2020 -- 19:34:25
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.15
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	3
+	Number of measurements	=	2
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	13.5000000
+	Critical F	=	3.1012958
+	Numerator df	=	2.0000000
+	Denominator df	=	87.0000000
+	Total sample size	=	90
+	Actual power	=	0.9088800
+
+[6] -- Saturday, June 06, 2020 -- 19:35:38
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.15
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	3
+	Number of measurements	=	6
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	21.6000000
+	Critical F	=	1.8729549
+	Numerator df	=	10.0000000
+	Denominator df	=	225
+	Total sample size	=	48
+	Actual power	=	0.9036468
+
+[7] -- Saturday, June 06, 2020 -- 19:35:44
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.15
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	3
+	Number of measurements	=	2
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	13.5000000
+	Critical F	=	3.1012958
+	Numerator df	=	2.0000000
+	Denominator df	=	87.0000000
+	Total sample size	=	90
+	Actual power	=	0.9088800
+
+[8] -- Saturday, June 06, 2020 -- 19:37:36
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.33
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	3
+	Number of measurements	=	2
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	15.2460000
+	Critical F	=	3.5545571
+	Numerator df	=	2.0000000
+	Denominator df	=	18.0000000
+	Total sample size	=	21
+	Actual power	=	0.9039881
+
+[9] -- Saturday, June 06, 2020 -- 19:37:51
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.150
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	3
+	Number of measurements	=	2
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	13.5000000
+	Critical F	=	3.1012958
+	Numerator df	=	2.0000000
+	Denominator df	=	87.0000000
+	Total sample size	=	90
+	Actual power	=	0.9088800
+
+[10] -- Saturday, June 06, 2020 -- 20:51:12
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.115
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	2
+	Number of measurements	=	2
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	10.7563333
+	Critical F	=	3.9201244
+	Numerator df	=	1.0000000
+	Denominator df	=	120
+	Total sample size	=	122
+	Actual power	=	0.9020572
+
+[11] -- Saturday, June 06, 2020 -- 20:51:22
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.115
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	2
+	Number of measurements	=	6
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	16.9280000
+	Critical F	=	2.2431132
+	Numerator df	=	5.0000000
+	Denominator df	=	310
+	Total sample size	=	64
+	Actual power	=	0.9031564
+
+[12] -- Saturday, June 06, 2020 -- 20:54:32
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.115
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	2
+	Number of measurements	=	3
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	12.9605000
+	Critical F	=	3.0429640
+	Numerator df	=	2.0000000
+	Denominator df	=	192
+	Total sample size	=	98
+	Actual power	=	0.9024970
+
+[13] -- Saturday, June 06, 2020 -- 21:09:05
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=		0.195	
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	2
+	Number of measurements	=	3
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	13.6890000
+	Critical F	=	3.1316720
+	Numerator df	=	2.0000000
+	Denominator df	=	68.0000000
+	Total sample size	=	36
+	Actual power	=	0.9100558
+
+[14] -- Saturday, June 06, 2020 -- 21:09:13
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=		0.195
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	2
+	Number of measurements	=	3
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	13.6890000
+	Critical F	=	3.1316720
+	Numerator df	=	2.0000000
+	Denominator df	=	68.0000000
+	Total sample size	=	36
+	Actual power	=	0.9100558
+
+[15] -- Saturday, June 06, 2020 -- 21:09:26
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.195
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	2
+	Number of measurements	=	3
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	13.6890000
+	Critical F	=	3.1316720
+	Numerator df	=	2.0000000
+	Denominator df	=	68.0000000
+	Total sample size	=	36
+	Actual power	=	0.9100558
+
+[16] -- Saturday, June 06, 2020 -- 21:09:55
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.115
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	2
+	Number of measurements	=	3
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	12.9605000
+	Critical F	=	3.0429640
+	Numerator df	=	2.0000000
+	Denominator df	=	192
+	Total sample size	=	98
+	Actual power	=	0.9024970
+
+[17] -- Saturday, June 06, 2020 -- 21:10:05
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.5
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	2
+	Number of measurements	=	3
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	20.0000000
+	Critical F	=	3.8852938
+	Numerator df	=	2.0000000
+	Denominator df	=	12.0000000
+	Total sample size	=	8
+	Actual power	=	0.9482497
+
+[18] -- Saturday, June 06, 2020 -- 21:10:25
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.195
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	2
+	Number of measurements	=	3
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	13.6890000
+	Critical F	=	3.1316720
+	Numerator df	=	2.0000000
+	Denominator df	=	68.0000000
+	Total sample size	=	36
+	Actual power	=	0.9100558
+
+[19] -- Saturday, June 06, 2020 -- 21:13:40
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.105
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	2
+	Number of measurements	=	3
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	13.0095000
+	Critical F	=	3.0347502
+	Numerator df	=	2.0000000
+	Denominator df	=	232
+	Total sample size	=	118
+	Actual power	=	0.9044276
+
+[20] -- Saturday, June 06, 2020 -- 22:33:35
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.0001
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	2
+	Number of measurements	=	3
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	12.6539372
+	Critical F	=	2.9957323
+	Numerator df	=	2.0000000
+	Denominator df	=	2.530787e+008
+	Total sample size	=	126539372
+	Actual power	=	0.9000000
+
+[21] -- Saturday, June 06, 2020 -- 22:38:13
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.001
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	2
+	Number of measurements	=	3
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	12.6539600
+	Critical F	=	2.9957358
+	Numerator df	=	2.0000000
+	Denominator df	=	2530788
+	Total sample size	=	1265396
+	Actual power	=	0.9000002
+
+[22] -- Saturday, June 06, 2020 -- 22:39:14
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.001
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	2
+	Number of measurements	=	3
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	12.6539600
+	Critical F	=	2.9957358
+	Numerator df	=	2.0000000
+	Denominator df	=	2530788
+	Total sample size	=	1265396
+	Actual power	=	0.9000002
+
+[23] -- Saturday, June 06, 2020 -- 22:47:04
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.105
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	2
+	Number of measurements	=	3
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	13.0095000
+	Critical F	=	3.0347502
+	Numerator df	=	2.0000000
+	Denominator df	=	232
+	Total sample size	=	118
+	Actual power	=	0.9044276
+
+[24] -- Saturday, June 06, 2020 -- 22:47:04
+F tests - ANOVA: Repeated measures, within-between interaction
+Analysis:	A priori: Compute required sample size 
+Input:	Effect size f	=	0.105
+	α err prob	=	0.05
+	Power (1-β err prob)	=	0.9
+	Number of groups	=	2
+	Number of measurements	=	3
+	Corr among rep measures	=	0.7
+	Nonsphericity correction ε	=	1
+Output:	Noncentrality parameter λ	=	13.0095000
+	Critical F	=	3.0347502
+	Numerator df	=	2.0000000
+	Denominator df	=	232
+	Total sample size	=	118
+	Actual power	=	0.9044276
