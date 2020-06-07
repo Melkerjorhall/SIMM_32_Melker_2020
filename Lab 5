@@ -1,0 +1,826 @@
+* Encoding: UTF-8.
+
+DATASET ACTIVATE DataSet2.
+SPSSINC CREATE DUMMIES VARIABLE=sex 
+ROOTNAME1=dummy_sex 
+/OPTIONS ORDER=A USEVALUELABELS=YES USEML=YES OMITFIRST=NO.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=time pain MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: time=col(source(s), name("time"), unit.category())
+  DATA: pain=col(source(s), name("pain"), unit.category())
+  GUIDE: axis(dim(1), label("time"))
+  GUIDE: axis(dim(2), label("pain"))
+  GUIDE: text.title(label("Simple Scatter of pain by time"))
+  ELEMENT: point(position(time*pain))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=time COUNT()[name="COUNT"] MISSING=LISTWISE 
+    REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: time=col(source(s), name("time"), unit.category())
+  DATA: COUNT=col(source(s), name("COUNT"))
+  GUIDE: axis(dim(1), label("time"))
+  GUIDE: axis(dim(2), label("Count"))
+  GUIDE: text.title(label("Simple Line Count of time"))
+  SCALE: linear(dim(2), include(0))
+  ELEMENT: line(position(time*COUNT), missing.wings())
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=age pain MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: age=col(source(s), name("age"))
+  DATA: pain=col(source(s), name("pain"), unit.category())
+  GUIDE: axis(dim(1), label("age"))
+  GUIDE: axis(dim(2), label("pain"))
+  GUIDE: text.title(label("Simple Scatter of pain by age"))
+  ELEMENT: point(position(age*pain))
+END GPL.
+
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT | SUBJECT(ID) COVTYPE(VC)
+  /SAVE=PRED.
+
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT time | SUBJECT(ID) COVTYPE(UN)
+  /SAVE=PRED.
+
+DATASET ACTIVATE DataSet1.
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=time pain ID MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: time=col(source(s), name("time"), unit.category())
+  DATA: pain=col(source(s), name("pain"), unit.category())
+  DATA: ID=col(source(s), name("ID"), unit.category())
+  GUIDE: axis(dim(1), label("time"))
+  GUIDE: axis(dim(2), label("pain"))
+  GUIDE: legend(aesthetic(aesthetic.color.interior), label("ID"))
+  GUIDE: text.title(label("Multiple Line of pain by time by ID"))
+  ELEMENT: line(position(time*pain), color.interior(ID), missing.wings())
+END GPL.
+
+EXAMINE VARIABLES=pain BY ID
+  /PLOT BOXPLOT STEMLEAF
+  /COMPARE GROUPS
+  /STATISTICS NONE
+  /CINTERVAL 95
+  /MISSING LISTWISE
+  /NOTOTAL.
+
+DATASET ACTIVATE DataSet1.
+MIXED pain WITH STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time age
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=COVB  SOLUTION
+  /RANDOM=INTERCEPT | SUBJECT(ID) COVTYPE(VC)
+  /SAVE=PRED.
+
+MIXED pain WITH STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time age
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time age | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=COVB  SOLUTION
+  /RANDOM=INTERCEPT | SUBJECT(ID) COVTYPE(VC)
+  /SAVE=PRED.
+
+MIXED pain WITH STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time age
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time age | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=COVB  SOLUTION
+  /RANDOM=INTERCEPT time | SUBJECT(ID) COVTYPE(UN)
+  /SAVE=PRED.
+
+DATASET ACTIVATE DataSet2.
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=time pain_merged data_type MISSING=LISTWISE 
+    REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: time=col(source(s), name("time"), unit.category())
+  DATA: pain_merged=col(source(s), name("pain_merged"), unit.category())
+  DATA: data_type=col(source(s), name("data_type"), unit.category())
+  GUIDE: axis(dim(1), label("time"))
+  GUIDE: axis(dim(2), label("pain_merged"))
+  GUIDE: legend(aesthetic(aesthetic.color.interior), label("data_type"))
+  GUIDE: text.title(label("Multiple Line of pain_merged by time by data_type"))
+  ELEMENT: line(position(time*pain_merged), color.interior(data_type), missing.wings())
+END GPL.
+
+SORT CASES  BY ID.
+SPLIT FILE SEPARATE BY ID.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=time pain_merged data_type MISSING=LISTWISE 
+    REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: time=col(source(s), name("time"), unit.category())
+  DATA: pain_merged=col(source(s), name("pain_merged"), unit.category())
+  DATA: data_type=col(source(s), name("data_type"), unit.category())
+  GUIDE: axis(dim(1), label("time"))
+  GUIDE: axis(dim(2), label("pain_merged"))
+  GUIDE: legend(aesthetic(aesthetic.color.interior), label("data_type"))
+  GUIDE: text.title(label("Multiple Line of pain_merged by time by data_type"))
+  ELEMENT: line(position(time*pain_merged), color.interior(data_type), missing.wings())
+END GPL.
+
+DESCRIPTIVES VARIABLES=time
+  /STATISTICS=MEAN STDDEV MIN MAX.
+
+COMPUTE timeCentered=time - 2.5.
+EXECUTE.
+
+COMPUTE timeC_squared=timeCentered * timeCentered.
+EXECUTE.
+
+DATASET ACTIVATE DataSet4.
+COMPUTE time_centered=time - 2.5.
+EXECUTE.
+
+COMPUTE timeC_squared=time_centered * time_centered.
+EXECUTE.
+
+DATASET ACTIVATE DataSet1.
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered 
+    timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared 
+    | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT | SUBJECT(ID) COVTYPE(VC)
+  /SAVE=PRED.
+
+DATASET ACTIVATE DataSet1.
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness time_centered timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness time_centered timeC_squared | SSTYPE(3)
+  /METHOD=REML
+  /RANDOM=INTERCEPT time_centered timeC_squared | SUBJECT(ID) COVTYPE(UN)
+  /SAVE=PRED.
+
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness time_centered timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness time_centered timeC_squared | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=DESCRIPTIVES
+  /RANDOM=INTERCEPT time_centered timeC_squared | SUBJECT(ID) COVTYPE(UN)
+  /SAVE=PRED.
+
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness time_centered timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness time_centered timeC_squared | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB DESCRIPTIVES  SOLUTION
+  /RANDOM=INTERCEPT time_centered timeC_squared | SUBJECT(ID) COVTYPE(UN)
+  /SAVE=PRED.
+
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness time_centered timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness time_centered timeC_squared | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB DESCRIPTIVES  SOLUTION
+  /RANDOM=INTERCEPT time_centered timeC_squared | SUBJECT(ID) COVTYPE(UN)
+  /SAVE=PRED.
+
+DATASET ACTIVATE DataSet2.
+SORT CASES  BY ID.
+SPLIT FILE SEPARATE BY ID.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=time pain data_file MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: time=col(source(s), name("time"), unit.category())
+  DATA: pain=col(source(s), name("pain"), unit.category())
+  DATA: data_file=col(source(s), name("data_file"), unit.category())
+  GUIDE: axis(dim(1), label("time"))
+  GUIDE: axis(dim(2), label("pain"))
+  GUIDE: legend(aesthetic(aesthetic.color.interior), label("data_file"))
+  GUIDE: text.title(label("Multiple Line of pain by time by data_file"))
+  ELEMENT: line(position(time*pain), color.interior(data_file), missing.wings())
+END GPL.
+
+DATASET ACTIVATE DataSet3.
+MIXED pain BY STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared    
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared | 
+    SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT time_centered timeC_squared | SUBJECT(ID) COVTYPE(UN)
+  /SAVE=PRED RESID.
+
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered 
+    timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared 
+    | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT time_centered timeC_squared | SUBJECT(ID) COVTYPE(UN)
+  /SAVE=PRED RESID.
+
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered 
+    timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared 
+    | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT time_centered timeC_squared | SUBJECT(ID) COVTYPE(UN)
+  /SAVE=PRED RESID.
+
+SORT CASES  BY ID.
+SPLIT FILE SEPARATE BY ID.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=time pain data_file MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: time=col(source(s), name("time"), unit.category())
+  DATA: pain=col(source(s), name("pain"), unit.category())
+  DATA: data_file=col(source(s), name("data_file"), unit.category())
+  GUIDE: axis(dim(1), label("time"))
+  GUIDE: axis(dim(2), label("pain"))
+  GUIDE: legend(aesthetic(aesthetic.color.interior), label("data_file"))
+  GUIDE: text.title(label("Multiple Line of pain by time by data_file"))
+  ELEMENT: line(position(time*pain), color.interior(data_file), missing.wings())
+END GPL.
+
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered 
+    timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared 
+    | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT time_centered timeC_squared | SUBJECT(ID) COVTYPE(UN)
+  /SAVE=PRED RESID.
+
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered 
+    timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared 
+    | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT time_centered timeC_squared | SUBJECT(ID) COVTYPE(UN)
+  /SAVE=PRED RESID.
+
+EXAMINE VARIABLES=Residual_slopes_squared
+  /PLOT BOXPLOT STEMLEAF HISTOGRAM NPPLOT
+  /COMPARE GROUPS
+  /STATISTICS DESCRIPTIVES
+  /CINTERVAL 95
+  /MISSING LISTWISE
+  /NOTOTAL.
+
+BOOTSTRAP
+  /SAMPLING METHOD=SIMPLE
+  /VARIABLES TARGET=pain INPUT= age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 
+    time_centered timeC_squared  
+  /CRITERIA CILEVEL=95 CITYPE=BCA  NSAMPLES=1000
+  /MISSING USERMISSING=EXCLUDE.
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered 
+    timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared 
+    | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT time_centered timeC_squared | SUBJECT(ID) COVTYPE(UN)
+  /SAVE=PRED RESID.
+
+BOOTSTRAP
+  /SAMPLING METHOD=SIMPLE
+  /VARIABLES TARGET=pain INPUT= age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 
+    time_centered timeC_squared  
+  /CRITERIA CILEVEL=95 CITYPE=BCA  NSAMPLES=1000
+  /MISSING USERMISSING=EXCLUDE.
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered 
+    timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared 
+    | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT time_centered timeC_squared | SUBJECT(ID) COVTYPE(UN)
+  /SAVE=PRED RESID.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=Residual_slopes_squared pred_slopes_squared 
+    MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: Residual_slopes_squared=col(source(s), name("Residual_slopes_squared"))
+  DATA: pred_slopes_squared=col(source(s), name("pred_slopes_squared"))
+  GUIDE: axis(dim(1), label("Residuals"))
+  GUIDE: axis(dim(2), label("Predicted Values squaretime"))
+  GUIDE: text.title(label("Simple Scatter of Predicted Values squaretime by Residuals"))
+  ELEMENT: point(position(Residual_slopes_squared*pred_slopes_squared))
+END GPL.
+
+CORRELATIONS
+  /VARIABLES=age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 pain time_centered 
+    timeC_squared
+  /PRINT=TWOTAIL NOSIG
+  /MISSING=PAIRWISE.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=Residual_slopes_squared pred_slopes_squared 
+    MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: Residual_slopes_squared=col(source(s), name("Residual_slopes_squared"))
+  DATA: pred_slopes_squared=col(source(s), name("pred_slopes_squared"))
+  GUIDE: axis(dim(1), label("Residuals"))
+  GUIDE: axis(dim(2), label("Predicted Values squaretime"))
+  GUIDE: text.title(label("Simple Scatter of Predicted Values squaretime by Residuals"))
+  ELEMENT: point(position(Residual_slopes_squared*pred_slopes_squared))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=age Residual_slopes_squared MISSING=LISTWISE 
+    REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: age=col(source(s), name("age"))
+  DATA: Residual_slopes_squared=col(source(s), name("Residual_slopes_squared"))
+  GUIDE: axis(dim(1), label("age"))
+  GUIDE: axis(dim(2), label("Residuals"))
+  GUIDE: text.title(label("Simple Scatter of Residuals by age"))
+  ELEMENT: point(position(age*Residual_slopes_squared))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=STAI_trait Residual_slopes_squared MISSING=LISTWISE 
+    REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: STAI_trait=col(source(s), name("STAI_trait"))
+  DATA: Residual_slopes_squared=col(source(s), name("Residual_slopes_squared"))
+  GUIDE: axis(dim(1), label("STAI_trait"))
+  GUIDE: axis(dim(2), label("Residuals"))
+  GUIDE: text.title(label("Simple Scatter of Residuals by STAI_trait"))
+  ELEMENT: point(position(STAI_trait*Residual_slopes_squared))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=pain_cat Residual_slopes_squared MISSING=LISTWISE 
+    REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: pain_cat=col(source(s), name("pain_cat"))
+  DATA: Residual_slopes_squared=col(source(s), name("Residual_slopes_squared"))
+  GUIDE: axis(dim(1), label("pain_cat"))
+  GUIDE: axis(dim(2), label("Residuals"))
+  GUIDE: text.title(label("Simple Scatter of Residuals by pain_cat"))
+  ELEMENT: point(position(pain_cat*Residual_slopes_squared))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=cortisol_serum Residual_slopes_squared 
+    MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: cortisol_serum=col(source(s), name("cortisol_serum"))
+  DATA: Residual_slopes_squared=col(source(s), name("Residual_slopes_squared"))
+  GUIDE: axis(dim(1), label("cortisol_serum"))
+  GUIDE: axis(dim(2), label("Residuals"))
+  GUIDE: text.title(label("Simple Scatter of Residuals by cortisol_serum"))
+  ELEMENT: point(position(cortisol_serum*Residual_slopes_squared))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=mindfulness Residual_slopes_squared MISSING=LISTWISE 
+    REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: mindfulness=col(source(s), name("mindfulness"))
+  DATA: Residual_slopes_squared=col(source(s), name("Residual_slopes_squared"))
+  GUIDE: axis(dim(1), label("mindfulness"))
+  GUIDE: axis(dim(2), label("Residuals"))
+  GUIDE: text.title(label("Simple Scatter of Residuals by mindfulness"))
+  ELEMENT: point(position(mindfulness*Residual_slopes_squared))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=dummy_sex_1 Residual_slopes_squared MISSING=LISTWISE 
+    REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: dummy_sex_1=col(source(s), name("dummy_sex_1"), unit.category())
+  DATA: Residual_slopes_squared=col(source(s), name("Residual_slopes_squared"))
+  GUIDE: axis(dim(1), label("sex=female"))
+  GUIDE: axis(dim(2), label("Residuals"))
+  GUIDE: text.title(label("Simple Scatter of Residuals by sex=female"))
+  SCALE: linear(dim(2), include(0))
+  ELEMENT: point(position(dummy_sex_1*Residual_slopes_squared))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=pain Residual_slopes_squared MISSING=LISTWISE 
+    REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: pain=col(source(s), name("pain"), unit.category())
+  DATA: Residual_slopes_squared=col(source(s), name("Residual_slopes_squared"))
+  GUIDE: axis(dim(1), label("pain"))
+  GUIDE: axis(dim(2), label("Residuals"))
+  GUIDE: text.title(label("Simple Scatter of Residuals by pain"))
+  SCALE: linear(dim(2), include(0))
+  ELEMENT: point(position(pain*Residual_slopes_squared))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=time_centered Residual_slopes_squared 
+    MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: time_centered=col(source(s), name("time_centered"))
+  DATA: Residual_slopes_squared=col(source(s), name("Residual_slopes_squared"))
+  GUIDE: axis(dim(1), label("time_centered"))
+  GUIDE: axis(dim(2), label("Residuals"))
+  GUIDE: text.title(label("Simple Scatter of Residuals by time_centered"))
+  ELEMENT: point(position(time_centered*Residual_slopes_squared))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=timeC_squared Residual_slopes_squared 
+    MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: timeC_squared=col(source(s), name("timeC_squared"))
+  DATA: Residual_slopes_squared=col(source(s), name("Residual_slopes_squared"))
+  GUIDE: axis(dim(1), label("timeC_squared"))
+  GUIDE: axis(dim(2), label("Residuals"))
+  GUIDE: text.title(label("Simple Scatter of Residuals by timeC_squared"))
+  ELEMENT: point(position(timeC_squared*Residual_slopes_squared))
+END GPL.
+
+SPSSINC CREATE DUMMIES VARIABLE=ID 
+ROOTNAME1=Dummy_ID 
+/OPTIONS ORDER=A USEVALUELABELS=YES USEML=YES OMITFIRST=NO.
+
+COMPUTE Actual_sq_residual_slsq=Residual_slopes_squared * Residual_slopes_squared.
+EXECUTE.
+
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS R ANOVA
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT Actual_sq_residual_slsq
+  /METHOD=ENTER Dummy_ID_2 Dummy_ID_3 Dummy_ID_4 Dummy_ID_5 Dummy_ID_6 Dummy_ID_7 Dummy_ID_8 
+    Dummy_ID_9 Dummy_ID_10 Dummy_ID_11 Dummy_ID_12 Dummy_ID_13 Dummy_ID_14 Dummy_ID_15 Dummy_ID_16 
+    Dummy_ID_17 Dummy_ID_18 Dummy_ID_19 Dummy_ID_20.
+
+BOOTSTRAP
+  /SAMPLING METHOD=SIMPLE
+  /VARIABLES TARGET=pain INPUT= age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 
+    time_centered timeC_squared  
+  /CRITERIA CILEVEL=95 CITYPE=BCA  NSAMPLES=1000
+  /MISSING USERMISSING=EXCLUDE.
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered 
+    timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared 
+    | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT time_centered timeC_squared | SUBJECT(ID) COVTYPE(UN)
+  /SAVE=PRED RESID.
+
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered 
+    timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared 
+    | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT time_centered timeC_squared | SUBJECT(ID) COVTYPE(UN) SOLUTION
+  /SAVE=PRED RESID.
+
+DATASET ACTIVATE DataSet5.
+EXAMINE VARIABLES=Prediction
+  /PLOT STEMLEAF NPPLOT
+  /STATISTICS DESCRIPTIVES
+  /CINTERVAL 95
+  /MISSING LISTWISE
+  /NOTOTAL.
+
+DATASET ACTIVATE DataSet7.
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=age Residual_slopes_squared MISSING=LISTWISE 
+    REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: age=col(source(s), name("age"))
+  DATA: Residual_slopes_squared=col(source(s), name("Residual_slopes_squared"))
+  GUIDE: axis(dim(1), label("age"))
+  GUIDE: axis(dim(2), label("Residuals"))
+  GUIDE: text.title(label("Simple Scatter of Residuals by age"))
+  ELEMENT: point(position(age*Residual_slopes_squared))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=STAI_trait Residual_slopes_squared MISSING=LISTWISE 
+    REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: STAI_trait=col(source(s), name("STAI_trait"))
+  DATA: Residual_slopes_squared=col(source(s), name("Residual_slopes_squared"))
+  GUIDE: axis(dim(1), label("STAI_trait"))
+  GUIDE: axis(dim(2), label("Residuals"))
+  GUIDE: text.title(label("Simple Scatter of Residuals by STAI_trait"))
+  ELEMENT: point(position(STAI_trait*Residual_slopes_squared))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=cortisol_serum Residual_slopes_squared 
+    MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: cortisol_serum=col(source(s), name("cortisol_serum"))
+  DATA: Residual_slopes_squared=col(source(s), name("Residual_slopes_squared"))
+  GUIDE: axis(dim(1), label("cortisol_serum"))
+  GUIDE: axis(dim(2), label("Residuals"))
+  GUIDE: text.title(label("Simple Scatter of Residuals by cortisol_serum"))
+  ELEMENT: point(position(cortisol_serum*Residual_slopes_squared))
+END GPL.
+
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered 
+    timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared 
+    | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT time_centered timeC_squared | SUBJECT(ID) COVTYPE(UN).
+
+DATASET ACTIVATE DataSet1.
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered 
+    timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared 
+    | SSTYPE(3)
+  /METHOD=REML
+  /RANDOM=INTERCEPT time_centered | SUBJECT(ID) COVTYPE(UN).
+
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered 
+    timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared 
+    | SSTYPE(3)
+  /METHOD=REML
+  /RANDOM=INTERCEPT time_centered | SUBJECT(ID) COVTYPE(UN).
+
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered 
+    timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared 
+    | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT time_centered | SUBJECT(ID) COVTYPE(UN).
+
+DATASET ACTIVATE DataSet2.
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered 
+    timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared 
+    | SSTYPE(3)
+  /METHOD=REML
+  /RANDOM=INTERCEPT time_centered | SUBJECT(ID) COVTYPE(UNR)
+  /SAVE=PRED RESID.
+
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered 
+    timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared 
+    | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT time_centered | SUBJECT(ID) COVTYPE(ID)
+  /SAVE=PRED RESID.
+
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered 
+    timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared 
+    | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT time_centered | SUBJECT(ID) COVTYPE(ID)
+  /SAVE=PRED RESID.
+
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered 
+    timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared 
+    | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT time_centered | SUBJECT(ID) COVTYPE(UN)
+  /SAVE=PRED RESID.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=age pain MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: age=col(source(s), name("age"))
+  DATA: pain=col(source(s), name("pain"), unit.category())
+  GUIDE: axis(dim(1), label("age"))
+  GUIDE: axis(dim(2), label("pain"))
+  GUIDE: text.title(label("Simple Scatter of pain by age"))
+  ELEMENT: point(position(age*pain))
+END GPL.
+
+SORT CASES  BY ID.
+SPLIT FILE SEPARATE BY ID.
+
+MIXED pain WITH STAI_trait pain_cat cortisol_serum cortisol_saliva mindfulness dummy_sex_1 
+    time_centered timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=STAI_trait pain_cat cortisol_serum cortisol_saliva mindfulness dummy_sex_1 time_centered 
+    timeC_squared | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT time_centered | SUBJECT(ID) COVTYPE(ID) SOLUTION
+  /SAVE=PRED RESID.
+
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum cortisol_saliva mindfulness dummy_sex_1 
+    time_centered timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=STAI_trait pain_cat cortisol_serum cortisol_saliva mindfulness dummy_sex_1 time_centered 
+    timeC_squared | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT time_centered | SUBJECT(ID) COVTYPE(UN) SOLUTION
+  /SAVE=PRED RESID.
+
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered 
+    timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared | 
+    SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT time_centered | SUBJECT(ID) COVTYPE(UN) SOLUTION
+  /SAVE=PRED RESID.
+
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered 
+    timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared age 
+    | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT time_centered | SUBJECT(ID) COVTYPE(UN) SOLUTION
+  /SAVE=PRED RESID.
+
+DATASET ACTIVATE DataSet6.
+EXAMINE VARIABLES=prediction
+  /PLOT BOXPLOT STEMLEAF HISTOGRAM NPPLOT
+  /COMPARE GROUPS
+  /STATISTICS DESCRIPTIVES
+  /CINTERVAL 95
+  /MISSING LISTWISE
+  /NOTOTAL.
+
+DATASET ACTIVATE DataSet5.
+COMPUTE New_sq_res_slope=New_residual_slopes * New_residual_slopes.
+EXECUTE.
+
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS R ANOVA
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT New_sq_res_slope
+  /METHOD=ENTER Dummy_ID_2 Dummy_ID_3 Dummy_ID_4 Dummy_ID_5 Dummy_ID_6 Dummy_ID_7 Dummy_ID_8 
+    Dummy_ID_9 Dummy_ID_10 Dummy_ID_11 Dummy_ID_12 Dummy_ID_13 Dummy_ID_14 Dummy_ID_15 Dummy_ID_16 
+    Dummy_ID_17 Dummy_ID_18 Dummy_ID_19 Dummy_ID_20.
+
+MIXED pain WITH age STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered 
+    timeC_squared
+  /CRITERIA=DFMETHOD(SATTERTHWAITE) CIN(95) MXITER(100) MXSTEP(10) SCORING(1) 
+    SINGULAR(0.000000000001) HCONVERGE(0, ABSOLUTE) LCONVERGE(0, ABSOLUTE) PCONVERGE(0.000001, ABSOLUTE)    
+  /FIXED=STAI_trait pain_cat cortisol_serum mindfulness dummy_sex_1 time_centered timeC_squared age 
+    | SSTYPE(3)
+  /METHOD=REML
+  /PRINT=CORB  SOLUTION
+  /RANDOM=INTERCEPT time_centered | SUBJECT(ID) COVTYPE(UN)
+  /SAVE=PRED RESID.
