@@ -1,0 +1,534 @@
+ Encoding: UTF-8.
+
+DATASET ACTIVATE DataSet1.
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=Survived Age MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: Survived=col(source(s), name("Survived"), unit.category())
+  DATA: Age=col(source(s), name("Age"))
+  DATA: id=col(source(s), name("$CASENUM"), unit.category())
+  GUIDE: axis(dim(1), label("Survived (0 = died 1 = lived)"))
+  GUIDE: axis(dim(2), label("Age"))
+  GUIDE: text.title(label("Simple Boxplot of Age by Survived (0 = died 1 = lived)"))
+  SCALE: linear(dim(2), include(0))
+  ELEMENT: schema(position(bin.quantile.letter(Survived*Age)), label(id))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=Survived Age Sex MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: Survived=col(source(s), name("Survived"), unit.category())
+  DATA: Age=col(source(s), name("Age"))
+  DATA: Sex=col(source(s), name("Sex"), unit.category())
+  DATA: id=col(source(s), name("$CASENUM"), unit.category())
+  COORD: rect(dim(1,2), cluster(3,0))
+  GUIDE: axis(dim(3), label("Survived (0 = died 1 = lived)"))
+  GUIDE: axis(dim(2), label("Age"))
+  GUIDE: legend(aesthetic(aesthetic.color), label("Sex"))
+  GUIDE: text.title(label("Clustered Boxplot of Age by Survived (0 = died 1 = lived) by Sex"))
+  SCALE: linear(dim(2), include(0))
+  ELEMENT: schema(position(bin.quantile.letter(Sex*Age*Survived)), color(Sex), label(id))
+END GPL.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=PassengerId COO_1 MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=NO.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: PassengerId=col(source(s), name("PassengerId"))
+  DATA: COO_1=col(source(s), name("COO_1"))
+  GUIDE: axis(dim(1), label("PassengerId"))
+  GUIDE: axis(dim(2), label("Analog of Cook's influence statistics"))
+  GUIDE: text.title(label("Simple Scatter of Analog of Cook's influence statistics by PassengerId"))    
+  ELEMENT: point(position(PassengerId*COO_1))
+END GPL.
+
+FILTER OFF.
+USE ALL.
+EXECUTE.
+
+SPSSINC CREATE DUMMIES VARIABLE=Sex 
+ROOTNAME1=DummySex 
+/OPTIONS ORDER=A USEVALUELABELS=YES USEML=YES OMITFIRST=NO.
+
+COMPUTE LN_AGE=LN(Age).
+EXECUTE.
+
+EXAMINE VARIABLES=Survived BY Sex SibSp Parch Embarked Pclass Fare Age
+  /PLOT BOXPLOT STEMLEAF HISTOGRAM
+  /COMPARE GROUPS
+  /PERCENTILES(5,10,25,50,75,90,95) HAVERAGE
+  /STATISTICS DESCRIPTIVES EXTREME
+  /CINTERVAL 95
+  /MISSING LISTWISE
+  /NOTOTAL.
+
+RECODE Embarked ('S'=0) ('C'=1) ('Q'=2) INTO EmbarkedNumeric.
+VARIABLE LABELS  EmbarkedNumeric '0 = Southhampton 1 = Cherbourg 2 = Queenstown'.
+EXECUTE.
+
+FREQUENCIES VARIABLES=EmbarkedNumeric
+  /STATISTICS=STDDEV VARIANCE RANGE MINIMUM MAXIMUM MEAN MEDIAN MODE SKEWNESS SESKEW KURTOSIS SEKURT    
+  /PIECHART FREQ
+  /ORDER=ANALYSIS.
+
+USE ALL.
+COMPUTE filter_$=(Fare  < 1).
+VARIABLE LABELS filter_$ 'Fare  < 1 (FILTER)'.
+VALUE LABELS filter_$ 0 'Not Selected' 1 'Selected'.
+FORMATS filter_$ (f1.0).
+FILTER BY filter_$.
+EXECUTE.
+
+LOGISTIC REGRESSION VARIABLES Survived
+  /METHOD=ENTER Age DummySex_1 EmbarkedNumeric SibSp Parch Fare Pclass 
+  /SAVE=COOK
+  /PRINT=CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
+
+SPSSINC CREATE DUMMIES VARIABLE=EmbarkedNumeric 
+ROOTNAME1=LocationDummy 
+/OPTIONS ORDER=A USEVALUELABELS=YES USEML=YES OMITFIRST=NO.
+
+LOGISTIC REGRESSION VARIABLES Survived
+  /METHOD=ENTER Age DummySex_1 SibSp Parch Fare Pclass LocationDummy_1 LocationDummy_2 
+  /SAVE=COOK
+  /PRINT=CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
+
+LOGISTIC REGRESSION VARIABLES Survived
+  /METHOD=ENTER Age DummySex_1 SibSp Parch Fare Pclass 
+  /SAVE=COOK
+  /PRINT=CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
+
+LOGISTIC REGRESSION VARIABLES Survived
+  /METHOD=ENTER Age DummySex_1 SibSp Fare Pclass 
+  /SAVE=COOK
+  /PRINT=CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
+
+SPSSINC CREATE DUMMIES VARIABLE=Pclass 
+ROOTNAME1=PerClassDummy 
+/OPTIONS ORDER=A USEVALUELABELS=YES USEML=YES OMITFIRST=NO.
+
+LOGISTIC REGRESSION VARIABLES Survived
+  /METHOD=ENTER Age DummySex_1 SibSp Parch PerClassDummy_2 PerClassDummy_3 
+  /SAVE=COOK
+  /PRINT=CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
+
+RECODE SibSp (0=0) (1=1) (SYSMIS=SYSMIS) (2 thru 8=2) INTO SibSpou_RECODED.
+EXECUTE.
+
+LOGISTIC REGRESSION VARIABLES Survived
+  /METHOD=ENTER Age DummySex_1 PerClassDummy_2 PerClassDummy_3 TravPaChi_RECODED Sibspou_DUMMY_1 
+    Sibspou_DUMMY_2 
+  /PRINT=CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
+
+COMPUTE Passengerclass_Sibspou_Interaction=Pclass * SibSp.
+EXECUTE.
+
+LOGISTIC REGRESSION VARIABLES Survived
+  /METHOD=ENTER Age DummySex_1 SibSp Parch Pclass 
+  /METHOD=ENTER Passengerclass_Sibspou_Interaction 
+  /PRINT=CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
+
+LOGISTIC REGRESSION VARIABLES Survived
+  /METHOD=ENTER Age DummySex_1 SibSp Parch PerClassDummy_2 PerClassDummy_3 
+  /PRINT=CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
+
+COMPUTE AGE_LOG=LN(Age).
+EXECUTE.
+
+COMPUTE Agelinearity=Age * AGE_LOG.
+EXECUTE.
+
+COMPUTE Sib2ndclass_Interaction=SibSp * PerClassDummy_2.
+EXECUTE.
+
+COMPUTE Sib3ndclass_Interaction=SibSp * PerClassDummy_3.
+EXECUTE.
+
+RECODE Age (SYSMIS=SYSMIS) (0 thru 18=0) (19 thru 40=1) (41 thru 65=2) (66 thru 80=3) INTO 
+    AgeCategory.
+VARIABLE LABELS  AgeCategory '0: 0-18 1: 19-40 2: 41-65 3: 66-80'.
+EXECUTE.
+
+LOGISTIC REGRESSION VARIABLES Survived
+  /METHOD=ENTER AgeCategory DummySex_1 Parch PerClassDummy_2 PerClassDummy_3 
+    Sib2ndclass_Interaction Sib3ndclass_Interaction 
+  /PRINT=CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
+
+LOGISTIC REGRESSION VARIABLES Survived
+  /METHOD=ENTER AgeCategory DummySex_1 Parch PerClassDummy_2 PerClassDummy_3 SibSp 
+    Sib2ndclass_Interaction Sib3ndclass_Interaction 
+  /PRINT=CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
+
+COMPUTE SexPersonalclass_Interaction=DummySex_1 * PerClassDummy_2.
+EXECUTE.
+
+COMPUTE SexPersonalclass3rd_Interaction=DummySex_1 *PerClassDummy_3.
+EXECUTE.
+
+COMPUTE FemaleSibsp_Interaction=DummySex_1 *SibSp.
+EXECUTE.
+
+COMPUTE FemaleSibsp2ndclass_Interaction=DummySex_1 *SibSp * Sibspou_DUMMY_2.
+EXECUTE.
+
+COMPUTE FemaleSibsp3rdclass_Interaction=DummySex_1 *SibSp * PerClassDummy_3.
+EXECUTE.
+
+COMPUTE Familyinteraction=SibSp * Parch.
+EXECUTE.
+
+COMPUTE Familj=Parch +SibSp.
+EXECUTE.
+
+DATASET ACTIVATE DataSet1.
+LOGISTIC REGRESSION VARIABLES Survived
+  /METHOD=ENTER AgeCategory DummySex_1 PerClassDummy_2 PerClassDummy_3 Sib2ndclass_Interaction 
+    Sib3ndclass_Interaction SibSp Parch 
+  /PRINT=CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
+
+COMPUTE FamilyPerclass2_Interaction=Familj * PerClassDummy_2.
+EXECUTE.
+
+COMPUTE FamilyPerclass3_Interaction=Familj * PerClassDummy_3.
+EXECUTE.
+
+LOGISTIC REGRESSION VARIABLES Survived
+  /METHOD=ENTER AgeCategory DummySex_1 PerClassDummy_2 PerClassDummy_3 Familj 
+    FamilyPerclass2_Interaction FamilyPerclass3_Interaction 
+  /PRINT=CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
+
+LOGISTIC REGRESSION VARIABLES Survived
+  /METHOD=ENTER AgeCategory DummySex_1 PerClassDummy_2 PerClassDummy_3 SibSp Parch 
+    Sib2ndclass_Interaction Sib3ndclass_Interaction 
+  /PRINT=CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
+
+DATASET ACTIVATE DataSet2.
+SPSSINC CREATE DUMMIES VARIABLE=Sex 
+ROOTNAME1=Dummysex 
+/OPTIONS ORDER=A USEVALUELABELS=YES USEML=YES OMITFIRST=NO.
+
+RECODE Cabin ('No Cab'=0) (ELSE=1) INTO RegisteredCabNumber.
+EXECUTE.
+
+SPSSINC CREATE DUMMIES VARIABLE=Pclass 
+ROOTNAME1=Personclass_Dummy 
+/OPTIONS ORDER=A USEVALUELABELS=YES USEML=YES OMITFIRST=NO.
+
+EXAMINE VARIABLES=Pclass Age SibSp Parch RegisteredCabNumber BY Survived
+  /PLOT BOXPLOT STEMLEAF
+  /COMPARE GROUPS
+  /STATISTICS DESCRIPTIVES
+  /CINTERVAL 95
+  /MISSING LISTWISE
+  /NOTOTAL.
+
+RECODE Age (SYSMIS=SYSMIS) (0 thru 18=0) (19 thru 37=1) (38 thru 56=2) (57 thru 80=3) INTO 
+    AgeCategory.
+EXECUTE.
+
+COMPUTE Sib2ndclass_Interaction=Personclass_Dummy_2 * SibSp.
+EXECUTE.
+
+COMPUTE Sib3rdclass_Interaction=Personclass_Dummy_3 * SibSp.
+EXECUTE.
+
+LOGISTIC REGRESSION VARIABLES Survived
+  /METHOD=ENTER AgeCategory Dummysex_1 Parch Personclass_Dummy_2 Personclass_Dummy_3 
+    Sib2ndclass_Interaction Sib3rdclass_Interaction 
+  /PRINT=CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
+
+LOGISTIC REGRESSION VARIABLES Survived
+  /METHOD=ENTER AgeCategory Dummysex_1 Parch SibSp Personclass_Dummy_2 Personclass_Dummy_3 
+    Sib2ndclass_Interaction Sib3rdclass_Interaction 
+  /PRINT=CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
+
+COMPUTE SibspouParChi_Interaction=SibSp * Parch.
+EXECUTE.
+
+COMPUTE AGE_LOG=LN(Age).
+EXECUTE.
+
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS R ANOVA COLLIN TOL SELECTION
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT Survived
+  /METHOD=ENTER AgeCategory SibSp Parch Personclass_Dummy_2 Personclass_Dummy_3
+  /METHOD=ENTER Sib2ndclass_Interaction Sib3rdclass_Interaction.
+
+COMPUTE FemaleClass2_Interaction=Dummysex_1 * Personclass_Dummy_2.
+EXECUTE.
+
+COMPUTE FemaleClass3_Interaction=Dummysex_1 * Personclass_Dummy_3.
+EXECUTE.
+
+COMPUTE SibFemaleClass3_Interaction=Dummysex_1 * Sib3rdclass_Interaction.
+EXECUTE.
+
+LOGISTIC REGRESSION VARIABLES Survived
+  /METHOD=ENTER Dummysex_1 SibSp Parch Personclass_Dummy_2 Personclass_Dummy_3 AgeCategory 
+  /METHOD=ENTER Sib2ndclass_Interaction Sib3rdclass_Interaction FemaleClass2_Interaction 
+    FemaleClass3_Interaction 
+  /PRINT=CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
+
+COMPUTE ParchClass2_Interaction=Parch * Personclass_Dummy_2.
+EXECUTE.
+
+COMPUTE ParchClass3_Interaction=Parch * Personclass_Dummy_3.
+EXECUTE.
+
+NOMREG Survived (BASE=LAST ORDER=ASCENDING) BY Dummysex_1 AgeCategory SibSp Parch 
+    Personclass_Dummy_2 Personclass_Dummy_3 Sib2ndclass_Interaction Sib3rdclass_Interaction 
+    ParchClass2_Interaction ParchClass3_Interaction
+  /CRITERIA CIN(95) DELTA(0) MXITER(100) MXSTEP(5) CHKSEP(20) LCONVERGE(0) PCONVERGE(0.000001) 
+    SINGULAR(0.00000001)
+  /MODEL
+  /STEPWISE=PIN(.05) POUT(0.1) MINEFFECT(0) RULE(SINGLE) ENTRYMETHOD(LR) REMOVALMETHOD(LR)
+  /INTERCEPT=INCLUDE
+  /PRINT=PARAMETER SUMMARY LRT CPS STEP MFI IC.
+
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS R ANOVA COLLIN TOL
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT Survived
+  /METHOD=ENTER AgeCategory SibSp Parch Personclass_Dummy_2 Personclass_Dummy_3
+  /METHOD=ENTER Sib2ndclass_Interaction Sib3rdclass_Interaction ParchClass2_Interaction 
+    ParchClass3_Interaction.
+
+NOMREG Survived (BASE=FIRST ORDER=ASCENDING) BY Dummysex_1 AgeCategory SibSp Parch 
+    Personclass_Dummy_2 Personclass_Dummy_3 Sib2ndclass_Interaction Sib3rdclass_Interaction 
+    ParchClass2_Interaction ParchClass3_Interaction
+  /CRITERIA CIN(95) DELTA(0) MXITER(100) MXSTEP(5) CHKSEP(20) LCONVERGE(0) PCONVERGE(0.000001) 
+    SINGULAR(0.00000001)
+  /MODEL
+  /STEPWISE=PIN(.05) POUT(0.1) MINEFFECT(0) RULE(SINGLE) ENTRYMETHOD(LR) REMOVALMETHOD(LR)
+  /INTERCEPT=INCLUDE
+  /PRINT=FIT PARAMETER SUMMARY LRT CPS STEP MFI IC.
+
+NOMREG Survived (BASE=FIRST ORDER=ASCENDING) BY Dummysex_1 AgeCategory SibSp Parch 
+    Personclass_Dummy_2 Personclass_Dummy_3 Sib2ndclass_Interaction Sib3rdclass_Interaction 
+    ParchClass2_Interaction ParchClass3_Interaction
+  /CRITERIA CIN(95) DELTA(0) MXITER(100) MXSTEP(5) CHKSEP(20) LCONVERGE(0) PCONVERGE(0.000001) 
+    SINGULAR(0.00000001)
+  /MODEL
+  /STEPWISE=PIN(.05) POUT(0.1) MINEFFECT(0) RULE(SINGLE) ENTRYMETHOD(LR) REMOVALMETHOD(LR)
+  /INTERCEPT=INCLUDE
+  /PRINT=FIT PARAMETER SUMMARY LRT CPS STEP MFI IC.
+
+LOGISTIC REGRESSION VARIABLES Survived
+  /METHOD=ENTER Dummysex_1 SibSp Parch Personclass_Dummy_2 Personclass_Dummy_3 AgeCategory 
+  /METHOD=ENTER Sib2ndclass_Interaction Sib3rdclass_Interaction ParchClass2_Interaction 
+    ParchClass3_Interaction 
+  /PRINT=CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
+
+NOMREG Survived (BASE=FIRST ORDER=ASCENDING) WITH AgeCategory Dummysex_1 SibSp Parch 
+    Personclass_Dummy_2 Personclass_Dummy_3 Sib2ndclass_Interaction Sib3rdclass_Interaction 
+    ParchClass2_Interaction ParchClass3_Interaction
+  /CRITERIA CIN(95) DELTA(0) MXITER(100) MXSTEP(5) CHKSEP(20) LCONVERGE(0) PCONVERGE(0.000001) 
+    SINGULAR(0.00000001)
+  /MODEL
+  /STEPWISE=PIN(.05) POUT(0.1) MINEFFECT(0) RULE(SINGLE) ENTRYMETHOD(LR) REMOVALMETHOD(LR)
+  /INTERCEPT=INCLUDE
+  /PRINT=CLASSTABLE FIT PARAMETER SUMMARY LRT CPS STEP MFI IC.
+
+NOMREG Survived (BASE=FIRST ORDER=ASCENDING) WITH AgeCategory Dummysex_1 SibSp Parch 
+    Personclass_Dummy_2 Personclass_Dummy_3 Sib2ndclass_Interaction Sib3rdclass_Interaction 
+    ParchClass2_Interaction ParchClass3_Interaction
+  /CRITERIA CIN(95) DELTA(0) MXITER(100) MXSTEP(5) CHKSEP(20) LCONVERGE(0) PCONVERGE(0.000001) 
+    SINGULAR(0.00000001)
+  /MODEL
+  /STEPWISE=PIN(.05) POUT(0.1) MINEFFECT(0) RULE(SINGLE) ENTRYMETHOD(LR) REMOVALMETHOD(LR)
+  /INTERCEPT=INCLUDE
+  /PRINT=CLASSTABLE FIT PARAMETER SUMMARY LRT CPS STEP MFI IC.
+
+DATASET ACTIVATE DataSet1.
+RECODE SibSp (0=0) (SYSMIS=SYSMIS) (ELSE=1) INTO Sib_spouse.
+VARIABLE LABELS  Sib_spouse 'Do you have siblings/spouse with you?'.
+EXECUTE.
+
+LOGISTIC REGRESSION VARIABLES Survived
+  /METHOD=ENTER Dummysex_1 AgeCategory Personclass_Dummy_2 Personclass_Dummy_3 Sib_spouse 
+    Parch_child 
+  /PRINT=CORR CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
+
+COMPUTE Havesibspu_class2interaction=Sib_spouse * Personclass_Dummy_2.
+EXECUTE.
+
+COMPUTE Havesibspu_class3interaction=Sib_spouse * Personclass_Dummy_3.
+EXECUTE.
+
+COMPUTE Parchil_class2_interaction=Parch_child * Personclass_Dummy_2.
+EXECUTE.
+
+COMPUTE Parchil_class3_interaction=Parch_child * Personclass_Dummy_3.
+EXECUTE.
+
+LOGISTIC REGRESSION VARIABLES Survived
+  /METHOD=ENTER Personclass_Dummy_2 Personclass_Dummy_3 Sib_spouse Parch_child Dummysex_1 
+    AgeCategory 
+  /METHOD=ENTER Havesibspu_class2interaction Havesibspu_class3interaction 
+    Parchil_class2_interaction Parchil_class3_interaction 
+  /PRINT=CORR CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
+
+NOMREG Survived (BASE=FIRST ORDER=ASCENDING) WITH AgeCategory Dummysex_1 Personclass_Dummy_2 
+    Personclass_Dummy_3 Sib_spouse Parch_child Havesibspu_class2interaction 
+    Havesibspu_class3interaction Parchil_class2_interaction Parchil_class3_interaction
+  /CRITERIA CIN(95) DELTA(0) MXITER(100) MXSTEP(5) CHKSEP(20) LCONVERGE(0) PCONVERGE(0.000001) 
+    SINGULAR(0.00000001)
+  /MODEL
+  /STEPWISE=PIN(.05) POUT(0.1) MINEFFECT(0) RULE(SINGLE) ENTRYMETHOD(LR) REMOVALMETHOD(LR)
+  /INTERCEPT=INCLUDE
+  /PRINT=PARAMETER SUMMARY LRT CPS STEP MFI IC.
+
+NOMREG Survived (BASE=FIRST ORDER=ASCENDING) WITH AgeCategory Dummysex_1 Personclass_Dummy_2 
+    Personclass_Dummy_3 Sib_spouse Parch_child Havesibspu_class2interaction 
+    Havesibspu_class3interaction Parchil_class2_interaction Parchil_class3_interaction
+  /CRITERIA CIN(95) DELTA(0) MXITER(100) MXSTEP(5) CHKSEP(20) LCONVERGE(0) PCONVERGE(0.000001) 
+    SINGULAR(0.00000001)
+  /MODEL
+  /STEPWISE=PIN(.05) POUT(0.1) MINEFFECT(0) RULE(SINGLE) ENTRYMETHOD(LR) REMOVALMETHOD(LR)
+  /INTERCEPT=INCLUDE
+  /PRINT=PARAMETER SUMMARY LRT CPS STEP MFI IC.
+
+DATASET ACTIVATE DataSet1.
+SPSSINC CREATE DUMMIES VARIABLE=AgeCategory 
+ROOTNAME1=Age_Dummy 
+/OPTIONS ORDER=A USEVALUELABELS=YES USEML=YES OMITFIRST=NO.
+
+LOGISTIC REGRESSION VARIABLES Survived
+  /METHOD=ENTER Age_Dummy_2 Age_Dummy_3 Age_Dummy_4 Dummysex_1 Personclass_Dummy_2 
+    Personclass_Dummy_3 Sib_spouse Parch_child 
+  /METHOD=ENTER Havesibspu_class2interaction Havesibspu_class3interaction 
+    Parchil_class2_interaction Parchil_class3_interaction 
+  /PRINT=CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
+
+LOGISTIC REGRESSION VARIABLES Survived
+  /METHOD=ENTER Age_Dummy_2 Age_Dummy_3 Age_Dummy_4 Dummysex_1 Personclass_Dummy_2 
+    Personclass_Dummy_3 Sib_spouse Parch_child 
+  /METHOD=ENTER Havesibspu_class2interaction Havesibspu_class3interaction 
+    Parchil_class2_interaction Parchil_class3_interaction 
+  /PRINT=CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
+
+NOMREG Survived (BASE=FIRST ORDER=ASCENDING) BY Age_Dummy_1 Age_Dummy_2 Age_Dummy_3 Age_Dummy_4 
+    Dummysex_1 Personclass_Dummy_2 Personclass_Dummy_3 Sib_spouse Parch_child 
+    Havesibspu_class2interaction Havesibspu_class3interaction Parchil_class2_interaction 
+    Parchil_class3_interaction
+  /CRITERIA CIN(95) DELTA(0) MXITER(100) MXSTEP(5) CHKSEP(20) LCONVERGE(0) PCONVERGE(0.000001) 
+    SINGULAR(0.00000001)
+  /MODEL
+  /STEPWISE=PIN(.05) POUT(0.1) MINEFFECT(0) RULE(SINGLE) ENTRYMETHOD(LR) REMOVALMETHOD(LR)
+  /INTERCEPT=INCLUDE
+  /PRINT=PARAMETER SUMMARY LRT CPS STEP MFI IC.
+
+RECODE SibSp (0=0) (1=1) (2=2) (ELSE=3) INTO SibSpNew.
+EXECUTE.
+
+RECODE Parch (0=0) (1=1) (2=2) (SYSMIS=SYSMIS) (ELSE=3) INTO ParchNew.
+EXECUTE.
+
+RECODE SibSp (0=0) (1=1) (2=2) (SYSMIS=SYSMIS) (ELSE=3) INTO SibSpNew.
+EXECUTE.
+
+SPSSINC CREATE DUMMIES VARIABLE=ParchNew 
+ROOTNAME1=Parent_child_dummy 
+/OPTIONS ORDER=A USEVALUELABELS=YES USEML=YES OMITFIRST=NO.
+
+RECODE SibSp (0=0) (SYSMIS=SYSMIS) (1=1) (ELSE=0) INTO sibling_spouse_ONE.
+VARIABLE LABELS  sibling_spouse_ONE 'Do you have ONE sibling/spouse with you?'.
+EXECUTE.
+
+RECODE Parch (0=0) (SYSMIS=SYSMIS) (1=1) (ELSE=0) INTO Partner_child_one.
+VARIABLE LABELS  Partner_child_one 'Do you have ONE partner or child with you?'.
+EXECUTE.
+
+COMPUTE Female_age2_Interaction=Dummysex_1 * Age_Dummy_2.
+EXECUTE.
+
+COMPUTE Female_age3_Interaction=Dummysex_1 * Age_Dummy_3.
+EXECUTE.
+
+COMPUTE Female_age4_Interaction=Dummysex_1 *Age_Dummy_4.
+EXECUTE.
+
+DATASET ACTIVATE DataSet1.
+RECODE SibSp (SYSMIS=SYSMIS) (0=0) (1=1) (ELSE=2) INTO Sibspouse_New.
+EXECUTE.
+
+RECODE Parch (SYSMIS=SYSMIS) (0=0) (1=1) (ELSE=2) INTO Parh_New.
+EXECUTE.
+
+SPSSINC CREATE DUMMIES VARIABLE=Sibspouse_New 
+ROOTNAME1=SibspouseNew_dummy 
+/OPTIONS ORDER=A USEVALUELABELS=YES USEML=YES OMITFIRST=NO.
+
+SPSSINC CREATE DUMMIES VARIABLE=Parh_New 
+ROOTNAME1=Parch_New_Dummy 
+/OPTIONS ORDER=A USEVALUELABELS=YES USEML=YES OMITFIRST=NO.
+
+COMPUTE HaveOneSibsp_2ndclass_Interaction=SibspouseNew_dummy_2 * Personclass_Dummy_2.
+EXECUTE.
+
+COMPUTE HaveOneSibsp_3rdclass_Interaction=SibspouseNew_dummy_2 * Personclass_Dummy_3.
+EXECUTE.
+
+COMPUTE HaveTwoSibsp_2ndclass_Interaction=SibspouseNew_dummy_3 * Personclass_Dummy_2.
+EXECUTE.
+
+COMPUTE HaveTwoSibsp_3rdclass_Interaction=SibspouseNew_dummy_3 * Personclass_Dummy_3.
+EXECUTE.
+
+COMPUTE OneParchi_2ndclass_Interaction=Parch_New_Dummy_2 * Personclass_Dummy_2.
+EXECUTE.
+
+COMPUTE OneParchi_3rdclass_Interaction=Parch_New_Dummy_2 * Personclass_Dummy_3.
+EXECUTE.
+
+COMPUTE TwoParchi_2ndclass_Interaction=Parch_New_Dummy_3 * Personclass_Dummy_2.
+EXECUTE.
+
+COMPUTE TwoParchi_3rdclass_Interaction=Parch_New_Dummy_3 *Personclass_Dummy_3.
+EXECUTE.
+
+NOMREG Survived (BASE=FIRST ORDER=ASCENDING) WITH Age_Dummy_2 Age_Dummy_3 Age_Dummy_4 Dummysex_1 
+    Personclass_Dummy_2 Personclass_Dummy_3 Sib_spouse Parch_New_Dummy_2 Parch_New_Dummy_3 
+    Havesibspu_class2interaction Havesibspu_class3interaction OneParchi_2ndclass_Interaction 
+    OneParchi_3rdclass_Interaction TwoParchi_2ndclass_Interaction TwoParchi_3rdclass_Interaction
+  /CRITERIA CIN(95) DELTA(0) MXITER(100) MXSTEP(5) CHKSEP(20) LCONVERGE(0) PCONVERGE(0.000001) 
+    SINGULAR(0.00000001)
+  /MODEL
+  /STEPWISE=PIN(.05) POUT(0.1) MINEFFECT(0) RULE(SINGLE) ENTRYMETHOD(LR) REMOVALMETHOD(LR)
+  /INTERCEPT=INCLUDE
+  /PRINT=PARAMETER SUMMARY LRT CPS STEP MFI IC.
